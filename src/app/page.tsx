@@ -83,6 +83,9 @@ export default function LandingPage() {
         <Skyline />
       </section>
 
+      {/* ——— Daylight: Dhuhr + Asr share one warming sky ——— */}
+      <div className="daylight">
+
       {/* ——— Dhuhr: the heart of the day ——— */}
       <section id="features" className="feature-section">
         <div className="section-heading">
@@ -120,6 +123,8 @@ export default function LandingPage() {
         </div>
       </section>
 
+      </div>
+
       {/* ——— Maghrib: a moment of stillness ——— */}
       <section id="quran" className="verse-section">
         <PrayerMark t={0.95} label="Maghrib — a moment of stillness" light />
@@ -136,6 +141,9 @@ export default function LandingPage() {
         <Link href="/dashboard" className="primary-button dawn">Start your journey</Link>
         <div className="footer-base">
           <div className="brand-lockup"><span className="brand-mark"><MoonStar size={20} /></span><span><strong>Nur</strong><small>Your Islamic Companion</small></span></div>
+          <nav className="footer-links" aria-label="Footer">
+            <a href="#features">Features</a><a href="#learn">Learn</a><a href="#quran">Qur’an</a><a href="#about">About</a><Link href="/dashboard">Dashboard</Link>
+          </nav>
           <p>Built with care for Muslims at every stage of their journey.</p>
         </div>
       </footer>
