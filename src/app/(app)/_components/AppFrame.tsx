@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { Bell, Menu } from 'lucide-react';
 import Sidebar from './Sidebar';
 import SearchBox from './SearchBox';
+import { USER } from '@/data/content';
 
 export default function AppFrame({ children }: { children: React.ReactNode }) {
  const [navOpen, setNavOpen] = useState(false);
@@ -19,7 +20,7 @@ export default function AppFrame({ children }: { children: React.ReactNode }) {
    <header className="topbar">
     <button className="mobile-menu" aria-label={navOpen ? 'Close navigation menu' : 'Open navigation menu'} aria-expanded={navOpen} aria-controls="app-sidebar" onClick={() => setNavOpen(o => !o)}><Menu aria-hidden="true"/></button>
     <SearchBox/>
-    <div className="top-meta"><span><span aria-hidden="true">📍</span> Nairobi, Kenya</span><button aria-label="Notifications"><Bell size={19} aria-hidden="true"/></button><span className="avatar" aria-hidden="true">S</span><b>Salman</b></div>
+    <div className="top-meta"><span><span aria-hidden="true">📍</span> {USER.location}</span><button aria-label="Notifications"><Bell size={19} aria-hidden="true"/></button><span className="avatar" aria-hidden="true">{USER.initial}</span><b>{USER.name}</b></div>
    </header>
    <main className="app-main">{children}</main>
   </div>

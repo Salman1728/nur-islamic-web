@@ -1,19 +1,13 @@
 import Link from 'next/link';
 import { BookOpen, Check, HandHeart, MoonStar, Sparkles } from 'lucide-react';
+import { FIVE_PRAYERS, NEXT_PRAYER } from '@/data/prayer';
+import { LEARNING_JOURNEY } from '@/data/content';
 
 const features = [
   { icon: MoonStar, title: 'Prayer times', text: 'Accurate daily prayer times with a clear next-prayer countdown.' },
   { icon: BookOpen, title: 'Beginner Qur’an', text: 'Read short surahs with translation, transliteration and audio.' },
   { icon: Sparkles, title: 'Learn Salah', text: 'A calm, visual, step-by-step guide made for first-time learners.' },
   { icon: HandHeart, title: 'Essential duas', text: 'Simple daily duas for eating, sleeping, travel and protection.' },
-];
-
-const prayerTimes = [
-  { name: 'Fajr', time: '5:12 AM', now: true },
-  { name: 'Dhuhr', time: '12:31 PM' },
-  { name: 'Asr', time: '3:47 PM' },
-  { name: 'Maghrib', time: '6:42 PM' },
-  { name: 'Isha', time: '8:05 PM' },
 ];
 
 /** Sun-position marker: an arc of the day with a dot where the sun sits at this prayer. */
@@ -74,12 +68,12 @@ export default function LandingPage() {
           </div>
 
           <aside className="prayer-card" aria-label="Today’s prayer times">
-            <small>Next prayer · in 42 min</small>
-            <strong>Fajr</strong>
-            <em>5:12 AM</em>
+            <small>Next prayer · in {NEXT_PRAYER.remaining}</small>
+            <strong>{NEXT_PRAYER.name}</strong>
+            <em>{NEXT_PRAYER.time} {NEXT_PRAYER.meridiem}</em>
             <div className="prayer-rows">
-              {prayerTimes.map(p => (
-                <div key={p.name} className={p.now ? 'now' : ''}><span>{p.name}</span><b>{p.time}</b></div>
+              {FIVE_PRAYERS.map(p => (
+                <div key={p.name} className={p.name === NEXT_PRAYER.name ? 'now' : ''}><span>{p.name}</span><b>{p.time}</b></div>
               ))}
             </div>
           </aside>
@@ -116,11 +110,11 @@ export default function LandingPage() {
           <Link href="/dashboard" className="primary-button">Open learning journey</Link>
         </div>
         <div className="journey-card">
-          <div className="progress-head"><strong>My Learning Journey</strong><span>35%</span></div>
-          <div className="progress-bar"><i /></div>
-          {['What is Islam?', 'The Shahadah', 'The Five Pillars', 'How to make Wudu', 'How to pray Salah'].map((lesson, index) => (
-            <div className={`journey-row ${index < 3 ? 'complete' : ''}`} key={lesson}>
-              <span>{index < 3 ? '✓' : index + 1}</span><b>{lesson}</b><small>{index < 3 ? 'Completed' : 'Next lesson'}</small>
+          <div className="progress-head"><strong>My Learning Journey</strong><span>{LEARNING_JOURNEY.progressPercent}%</span></div>
+          <div className="progress-bar"><i style={{ width: `${LEARNING_JOURNEY.progressPercent}%` }} /></div>
+          {LEARNING_JOURNEY.lessons.map((lesson, index) => (
+            <div className={`journey-row ${index < LEARNING_JOURNEY.completedCount ? 'complete' : ''}`} key={lesson}>
+              <span>{index < LEARNING_JOURNEY.completedCount ? '✓' : index + 1}</span><b>{lesson}</b><small>{index < LEARNING_JOURNEY.completedCount ? 'Completed' : 'Next lesson'}</small>
             </div>
           ))}
         </div>
