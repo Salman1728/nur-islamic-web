@@ -263,6 +263,40 @@ h1, h2 { font-family: var(--font-display), Georgia, serif; font-weight: 400; }
 .stub-points{list-style:none;margin:0;padding:0;display:grid;gap:8px;font-size:13px;color:var(--muted)}
 .stub-page .primary-button{margin-top:8px}
 .nav-backdrop{display:none}
+
+/* ————— Qur'an reader ————— */
+.quran-head{max-width:640px;margin:10px auto 30px;text-align:center;display:grid;gap:12px;justify-items:center}
+.quran-head h1{margin:0;font-size:32px}
+.quran-head p{color:var(--muted);line-height:1.7;margin:0}
+.surah-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:15px;max-width:980px;margin:0 auto}
+.surah-card{position:relative;border:1px solid var(--line);border-radius:18px;background:#fff;box-shadow:0 7px 20px rgba(30,60,50,.05);padding:22px;display:grid;gap:6px;justify-items:start;transition:transform .2s ease,box-shadow .2s ease}
+.surah-card:hover{transform:translateY(-3px);box-shadow:0 16px 34px rgba(27,56,47,.1)}
+.surah-number{width:34px;height:34px;display:grid;place-items:center;border:1.5px solid var(--gold);border-radius:50% 50% 48% 52%;color:var(--gold);font-size:13px;font-weight:700}
+.surah-card .surah-arabic{font-family:var(--font-arabic),Georgia,serif;font-size:25px;color:var(--leaf);justify-self:end;margin-top:-38px}
+.surah-card h2{font-size:20px;margin:8px 0 0;font-family:var(--font-display),Georgia,serif;font-weight:400}
+.surah-card p{margin:0;color:var(--muted);font-size:13px}
+.surah-card small{color:var(--gold);font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-top:6px}
+.surah-reader{max-width:812px;margin:0 auto}
+.surah-crumb{margin:6px 0 14px}
+.surah-crumb a,.surah-pager a{display:inline-flex;align-items:center;gap:7px;color:var(--leaf);font-weight:700;font-size:14px}
+.surah-crumb a:hover,.surah-pager a:hover{color:var(--leaf-2)}
+.surah-head{padding:28px;text-align:center;display:grid;gap:8px;justify-items:center}
+.surah-head .surah-arabic{font-family:var(--font-arabic),Georgia,serif;font-size:34px;color:var(--leaf)}
+.surah-head h1{margin:0;font-size:26px}
+.surah-head h1 span{color:var(--muted);font-size:19px}
+.surah-head p{margin:0;color:var(--muted);line-height:1.7;font-size:14px;max-width:480px}
+.surah-head small{color:var(--gold);font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+.bismillah{font-family:var(--font-arabic),Georgia,serif;text-align:center;font-size:30px;color:var(--leaf);margin:30px 0 8px}
+.ayah-list{list-style:none;margin:18px 0 0;padding:0;display:grid;gap:14px}
+.ayah{padding:24px 26px}
+.ayah-arabic{font-family:var(--font-arabic),Georgia,serif;font-size:30px;line-height:2.1;text-align:right;margin:0 0 12px;color:var(--ink)}
+.ayah-mark{display:inline-grid;place-items:center;min-width:34px;height:34px;border:1.5px solid var(--gold);border-radius:50%;font-size:15px;color:var(--gold);margin-inline-start:12px;vertical-align:middle}
+.ayah-translit{font-style:italic;color:var(--green-2);margin:0 0 8px;font-size:14px;border-top:1px solid var(--line);padding-top:14px}
+.ayah-translation{margin:0;color:var(--ink);line-height:1.75;font-size:15px}
+.surah-pager{display:flex;justify-content:space-between;align-items:center;margin-top:26px;gap:14px}
+.surah-source{color:var(--muted);font-size:11px;text-align:center;margin:26px 0 0}
+@media(max-width:820px){.surah-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:560px){.surah-grid{grid-template-columns:1fr}.ayah-arabic{font-size:26px}.ayah{padding:19px}.quran-head h1{font-size:26px}}
 @media(max-width:820px){
  .sidebar.open{display:flex;position:fixed;inset:0 auto 0 0;width:min(300px,82vw);height:100vh;z-index:60;box-shadow:0 0 60px rgba(4,17,13,.45)}
  .nav-backdrop{display:block;position:fixed;inset:0;background:rgba(8,29,24,.45);border:0;padding:0;z-index:55;cursor:pointer}
