@@ -1,36 +1,50 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Nur — Your Islamic Companion
 
-## Getting Started
+Nur is a web companion for daily Islamic life: prayer times, Qur'an reading, duas, learning resources, and a personal dashboard. The current build is a static front-end — content is hardcoded while the product takes shape (see [docs/improvement-plan.md](docs/improvement-plan.md) for what's next).
 
-First, run the development server:
+## Tech stack
+
+- [Next.js](https://nextjs.org) 16 (App Router, Server Components) — **note:** this Next.js version has breaking changes; consult the vendored guides in `node_modules/next/dist/docs/` before relying on conventions from older versions (see `AGENTS.md`)
+- React 19, TypeScript (strict)
+- Tailwind CSS v4 (via `@tailwindcss/postcss`) plus hand-written design tokens in `src/app/globals.css`
+- [lucide-react](https://lucide.dev) icons
+- Fonts via `next/font/google`: Marcellus (display), Mulish (body), Amiri (Arabic)
+
+## Getting started
 
 ```bash
+npm ci
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Scripts
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Command | What it does |
+| --- | --- |
+| `npm run dev` | Start the dev server |
+| `npm run build` | Production build |
+| `npm run start` | Serve the production build |
+| `npm run lint` | ESLint (flat config, `eslint-config-next`) |
+| `npx tsc --noEmit` | Type-check |
 
-## Learn More
+## Project structure
 
-To learn more about Next.js, take a look at the following resources:
+```
+src/app/
+  layout.tsx          Root layout, fonts, metadata
+  page.tsx            Landing page ("day of light" prayer-cycle concept)
+  dashboard/page.tsx  Dashboard (prayer times, daily verse, learning journey)
+  globals.css         Design tokens + all styling
+docs/                 Architecture review and improvement plan
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Deployment
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Pushes to `main` deploy to production on Vercel via GitHub Actions (`.github/workflows/deploy.yml`). A quality job (lint, type-check, build) gates the deploy and also runs on pull requests. Required repository secrets: `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`, `VERCEL_TOKEN`.
 
-## Deploy on Vercel
+## Documentation
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- [Architecture review](docs/architecture-review.md) — current state of the codebase
+- [Improvement plan](docs/improvement-plan.md) — prioritized backlog (P0–P2)
