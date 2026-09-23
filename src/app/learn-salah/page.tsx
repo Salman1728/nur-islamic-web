@@ -51,6 +51,10 @@ export default function LearnSalah() {
 
   return (
     <ContentPage eyebrow="Beginner guide" title="Learn Salah" description="A calm, step-by-step guide to the movements and words of prayer. Use the arrow keys or buttons to move through each step.">
+      <Link href="/learn-salah/practice" className="practice-cta">
+        <span><b>Pray-along practice</b><small>Go through a whole prayer — every rak‘ah, in order — with recitation audio for Al-Fatihah.</small></span>
+        <ChevronRight size={20} />
+      </Link>
       <div className="lesson-layout">
         <section className="card lesson-view" aria-live="polite">
           <div className="step-number">Step {i + 1} of {SALAH_STEPS.length} · {step.position}</div>

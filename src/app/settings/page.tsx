@@ -6,7 +6,7 @@ import { CITIES, METHODS, useSettings, type Method } from '@/lib/settings';
 import { useLocate } from '@/lib/locate';
 import { tzLabel } from '@/lib/prayer';
 
-const STORED_KEYS = ['nur.settings', 'nur.tracker', 'nur.lessons', 'nur.duas.saved', 'nur.quran.bookmark', 'nur.quran.translit', 'nur.quran.english', 'nur.world'];
+const STORED_KEYS = ['nur.settings', 'nur.tracker', 'nur.lessons', 'nur.duas.saved', 'nur.quran.bookmark', 'nur.quran.translit', 'nur.quran.english', 'nur.world', 'nur.visited', 'nur.practice', 'nur.journey.manual'];
 const REGIONS = [...new Set(CITIES.map(c => c.region))];
 
 export default function SettingsPage() {

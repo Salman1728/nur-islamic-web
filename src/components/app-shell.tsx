@@ -1,15 +1,17 @@
 'use client';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { BookOpen, BookText, CalendarDays, CheckCircle2, Compass, GraduationCap, HandHeart, Home, MapPin, Menu, MoonStar, Quote, Search, Settings, Sparkles, X } from 'lucide-react';
+import { BookOpen, BookText, CalendarDays, CheckCircle2, Compass, GraduationCap, HandHeart, Home, MapPin, Menu, MoonStar, Quote, Route, Search, Settings, Sparkles, X } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useSettings } from '@/lib/settings';
 import { formatCountdown, formatTime, prayerState, useNow } from '@/lib/prayer';
 import { DUAS, LESSONS, TERMS } from '@/lib/content';
 import { HADITHS } from '@/lib/hadith';
+import { useStored } from '@/lib/store';
 
 export const NAV = [
   [Home, 'Dashboard', '/dashboard'],
+  [Route, 'First 30 days', '/journey'],
   [MoonStar, 'Prayer Times', '/prayer'],
   [BookOpen, 'Qur’an', '/quran'],
   [Sparkles, 'Learn Islam', '/learn'],
@@ -90,6 +92,10 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   const initial = settings.name.trim().charAt(0).toUpperCase();
 
   useEffect(() => { document.body.style.overflow = open ? 'hidden' : ''; }, [open]);
+
+  // Pages seen, kept in this browser only — lets "My first 30 days" tick steps off by itself.
+  const [, setVisited] = useStored<string[]>('nur.visited', []);
+  useEffect(() => { setVisited(v => (v.includes(pathname) ? v : [...v, pathname].slice(-200))); }, [pathname, setVisited]);
 
   return (
     <div className="app-shell" data-phase={state?.phase ?? 'dhuhr'}>

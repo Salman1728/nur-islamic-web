@@ -7,6 +7,7 @@ import { useSettings } from '@/lib/settings';
 import { PRAYERS, formatCountdown, formatTime, placeHour, prayerState, useNow } from '@/lib/prayer';
 import { hadithOfDay, sunnahUrl } from '@/lib/hadith';
 import { LocationBanner } from '@/components/location-banner';
+import { useJourney } from '@/lib/use-journey';
 import { formatGregorian, formatHijri, upcomingOccasions, HIJRI_MONTHS } from '@/lib/hijri';
 import { dayKey, useStored, type TrackerLog } from '@/lib/store';
 import { LESSONS } from '@/lib/content';
@@ -26,6 +27,7 @@ export default function Dashboard() {
   const now = useNow(1000);
   const [log, setLog] = useStored<TrackerLog>('nur.tracker', {});
   const [done] = useStored<string[]>('nur.lessons', []);
+  const journey = useJourney();
   const state = now ? prayerState(now, settings) : null;
   const day = state?.day ?? null; // calendar day at the chosen place
   const today = day ? log[dayKey(day)] ?? [] : [];
@@ -150,10 +152,20 @@ export default function Dashboard() {
               ))}
             </article>
             <article className="card beginner">
-              <span className="page-eyebrow">New to Islam?</span>
-              <h3>Start your journey here.</h3>
-              <p>Short, gentle lessons written for reverts and new learners.</p>
-              <Link href="/learn" className="primary-button small">Start learning <ChevronRight size={15} /></Link>
+              <span className="page-eyebrow">{journey.doneCount === 0 ? 'New to Islam?' : `My first 30 days · ${journey.doneCount}/30`}</span>
+              {journey.current ? (
+                <>
+                  <h3>{journey.doneCount === 0 ? 'Start your journey here.' : journey.current.title}</h3>
+                  <p>{journey.doneCount === 0 ? 'One small step a day — lessons, prayer practice and your first prayers, at your own pace.' : journey.current.note}</p>
+                  <Link href={journey.doneCount === 0 ? '/journey' : journey.current.href} className="primary-button small">{journey.doneCount === 0 ? 'Begin day 1' : journey.current.cta} <ChevronRight size={15} /></Link>
+                </>
+              ) : (
+                <>
+                  <h3>All 30 steps complete.</h3>
+                  <p>MashaAllah. Revisit any step whenever you like.</p>
+                  <Link href="/journey" className="primary-button small">See your journey <ChevronRight size={15} /></Link>
+                </>
+              )}
             </article>
           </aside>
         </div>
