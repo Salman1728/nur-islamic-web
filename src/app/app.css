@@ -486,3 +486,43 @@
 @media (prefers-reduced-motion: reduce) {
   .sidebar, .next-prayer, .dial, .needle, .time-progress i, .quick-card, .surah-item, .lesson-item { transition: none; }
 }
+
+/* ——— Hadith ——— */
+.hadith-card { padding: 20px; background: linear-gradient(170deg, var(--card), #fbf4e4); }
+.hadith-card blockquote, .hadith-item blockquote { margin: 0; font-family: var(--font-display), Georgia, serif; font-size: 17px; line-height: 1.6; color: var(--ink); }
+.hadith-ref { margin: 12px 0 0; font-size: 12px; color: var(--muted); line-height: 1.5; }
+.hadith-ref a { color: var(--gold); font-weight: 700; }
+.hadith-list { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.hadith-item { padding: 22px; display: flex; flex-direction: column; gap: 12px; scroll-margin-top: 90px; }
+.hadith-item:target { border-color: var(--gold); }
+.hadith-item .chip { margin-left: 0; align-self: flex-start; }
+.hadith-foot { margin-top: auto; display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; }
+.hadith-foot .hadith-ref { margin: 0; }
+.dua-actions a { width: 34px; height: 34px; display: grid; place-items: center; border-radius: 10px; border: 1px solid var(--line); background: var(--card); color: var(--muted); }
+.dua-actions a:hover { color: var(--leaf); border-color: var(--leaf); }
+
+/* ——— Location banner ——— */
+.location-banner { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; padding: 14px 18px; margin-bottom: 18px; border-radius: 16px; background: #fbefd5; border: 1px solid #ecd6a4; }
+.location-banner > svg { color: var(--gold); flex: none; }
+.location-banner p { flex: 1 1 320px; margin: 0; font-size: 14px; line-height: 1.5; color: #5b4a22; }
+
+/* ——— World clock ——— */
+.world-card { margin-top: 18px; }
+.world-card h3 { display: inline-flex; align-items: center; gap: 8px; }
+.world-card .card-title { flex-wrap: wrap; }
+.world-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; }
+.world-item { position: relative; display: grid; gap: 2px; padding: 16px; border-radius: 14px; background: #faf6ec; border: 1px solid #efe6d2; }
+.world-item b { font-size: 14px; }
+.world-item strong { font-family: var(--font-display), Georgia, serif; font-weight: 400; font-size: 30px; line-height: 1.2; font-variant-numeric: tabular-nums; }
+.world-item small { font-size: 11px; color: var(--muted); font-weight: 700; letter-spacing: .06em; }
+.world-item span { font-size: 13px; color: var(--leaf); margin-top: 6px; font-variant-numeric: tabular-nums; }
+.world-remove { position: absolute; top: 8px; right: 8px; width: 26px; height: 26px; display: grid; place-items: center; border: 0; border-radius: 8px; background: none; color: var(--muted); }
+.world-remove:hover { background: #efe6d2; color: var(--ink); }
+.method-line { margin: 14px 0 0; font-size: 12px; color: var(--muted); }
+.setting-row small + small { margin-top: 2px; }
+
+@media (max-width: 700px) {
+  .hadith-list { grid-template-columns: 1fr; }
+  .world-grid { grid-template-columns: 1fr 1fr; }
+  .world-item strong { font-size: 24px; }
+}

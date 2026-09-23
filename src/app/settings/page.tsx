@@ -4,11 +4,13 @@ import { Clock, LocateFixed, MapPin, Moon, Trash2, User } from 'lucide-react';
 import { ContentPage } from '@/components/content-page';
 import { CITIES, METHODS, useSettings, type Method } from '@/lib/settings';
 import { useLocate } from '@/lib/locate';
+import { tzLabel } from '@/lib/prayer';
 
-const STORED_KEYS = ['nur.settings', 'nur.tracker', 'nur.lessons', 'nur.duas.saved', 'nur.quran.bookmark', 'nur.quran.translit', 'nur.quran.english'];
+const STORED_KEYS = ['nur.settings', 'nur.tracker', 'nur.lessons', 'nur.duas.saved', 'nur.quran.bookmark', 'nur.quran.translit', 'nur.quran.english', 'nur.world'];
+const REGIONS = [...new Set(CITIES.map(c => c.region))];
 
 export default function SettingsPage() {
-  const { settings, update, ready } = useSettings();
+  const { settings, update, chooseCity, ready } = useSettings();
   const { locate, busy, error } = useLocate();
   const [confirm, setConfirm] = useState(false);
   const cityValue = CITIES.find(c => c.place === settings.place)?.place ?? '';
@@ -29,11 +31,15 @@ export default function SettingsPage() {
 
         <div className="card setting-row wrap">
           <MapPin />
-          <div><b>Location</b><small>{settings.place} · {settings.lat.toFixed(2)}, {settings.lng.toFixed(2)}</small>{error && <small className="form-error">{error}</small>}</div>
+          <div><b>Location</b><small>{settings.place} · {settings.lat.toFixed(2)}, {settings.lng.toFixed(2)} · {ready ? `${tzLabel(settings)} (${settings.tz.replace(/_/g, ' ')})` : ''}</small><small>Picking a city also sets its time zone and the calculation method used there.</small>{error && <small className="form-error">{error}</small>}</div>
           <div className="setting-controls">
-            <select className="field" value={cityValue} onChange={e => { const c = CITIES.find(x => x.place === e.target.value); if (c) update(c); }} aria-label="Choose a city">
+            <select className="field" value={cityValue} onChange={e => { const c = CITIES.find(x => x.place === e.target.value); if (c) chooseCity(c); }} aria-label="Choose a city">
               {!cityValue && <option value="">Custom location</option>}
-              {CITIES.map(c => <option key={c.place} value={c.place}>{c.place}</option>)}
+              {REGIONS.map(r => (
+                <optgroup key={r} label={r}>
+                  {CITIES.filter(c => c.region === r).map(c => <option key={c.place} value={c.place}>{c.place}</option>)}
+                </optgroup>
+              ))}
             </select>
             <button className="field-button" onClick={locate} disabled={busy}><LocateFixed size={16} /> {busy ? 'Locating…' : 'Use my location'}</button>
           </div>

@@ -2,7 +2,7 @@
 import { Check } from 'lucide-react';
 import { ContentPage } from '@/components/content-page';
 import { useSettings } from '@/lib/settings';
-import { PRAYERS, dayTimes, formatTime, useNow } from '@/lib/prayer';
+import { PRAYERS, addDays, dayTimes, formatTime, placeToday, useNow } from '@/lib/prayer';
 import { dayKey, streak, useStored, type TrackerLog } from '@/lib/store';
 
 export default function Tracker() {
@@ -17,11 +17,12 @@ export default function Tracker() {
 
   if (!now) return <ContentPage eyebrow="Private progress" title="Prayer Tracker" description="A private way to notice your consistency."><div className="card tracker-card" /></ContentPage>;
 
-  const key = dayKey(now);
+  const day = placeToday(now, settings); // today at the chosen place
+  const key = dayKey(day);
   const today = log[key] ?? [];
-  const times = dayTimes(now, settings);
-  const week = Array.from({ length: 7 }, (_, i) => { const d = new Date(now); d.setDate(now.getDate() - (6 - i)); return d; });
-  const run = streak(log, now);
+  const times = dayTimes(day, settings);
+  const week = Array.from({ length: 7 }, (_, i) => addDays(day, i - 6));
+  const run = streak(log, day);
 
   return (
     <ContentPage eyebrow="Private progress" title="Prayer Tracker" description="A private way to notice your consistency. It lives only in this browser — no accounts, no leaderboards, no pressure.">
@@ -36,7 +37,7 @@ export default function Tracker() {
               <button className={`tracker-row ${on ? 'on' : ''}`} key={p} onClick={() => toggle(key, p)} aria-pressed={on}>
                 <span className="tick">{on && <Check size={15} />}</span>
                 <b>{p}</b>
-                <small>{on ? 'Prayed' : upcoming ? `at ${formatTime(t, settings.hour24)}` : 'Not marked'}</small>
+                <small>{on ? 'Prayed' : upcoming ? `at ${formatTime(t, settings)}` : 'Not marked'}</small>
               </button>
             );
           })}

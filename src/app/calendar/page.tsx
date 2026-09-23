@@ -2,35 +2,39 @@
 import { useState } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { ContentPage } from '@/components/content-page';
-import { useNow } from '@/lib/prayer';
+import { placeToday, useNow } from '@/lib/prayer';
+import { useSettings } from '@/lib/settings';
 import { HIJRI_MONTHS, OCCASIONS, formatGregorian, formatHijri, hijriMonthDays, upcomingOccasions } from '@/lib/hijri';
 
 const WEEKDAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
 export default function CalendarPage() {
   const now = useNow(60_000);
+  const { settings } = useSettings();
   const [offset, setOffset] = useState(0); // Hijri months from the current one
 
   if (!now) return <ContentPage eyebrow="Dates & occasions" title="Islamic Calendar" description="Hijri dates and the important days of the Islamic year."><div className="calendar-skeleton card" /></ContentPage>;
 
+  const today = placeToday(now, settings); // today at the chosen place
+
   // Step ~29.5 days per month from today's Hijri month, landing mid-month to stay inside it.
-  const anchor = new Date(now);
-  const todayDays = hijriMonthDays(now);
-  anchor.setTime(todayDays[14]?.date.getTime() ?? now.getTime());
+  const anchor = new Date(today);
+  const todayDays = hijriMonthDays(today);
+  anchor.setTime(todayDays[14]?.date.getTime() ?? today.getTime());
   anchor.setDate(anchor.getDate() + Math.round(offset * 29.53));
   const days = hijriMonthDays(anchor);
   const { month, year } = days[0].hijri;
   const lead = (days[0].date.getDay() + 6) % 7; // Monday-first grid
-  const todayKey = now.toDateString();
-  const events = upcomingOccasions(now);
+  const todayKey = today.toDateString();
+  const events = upcomingOccasions(today);
 
   return (
     <ContentPage eyebrow="Dates & occasions" title="Islamic Calendar" description="Hijri dates follow the Umm al-Qura calculation. Local moon sighting can shift a date by a day — confirm with your mosque.">
       <div className="calendar-hero">
         <div>
           <span className="page-eyebrow">Today</span>
-          <h2>{formatHijri(now)}</h2>
-          <p>{formatGregorian(now)}</p>
+          <h2>{formatHijri(today)}</h2>
+          <p>{formatGregorian(today)}</p>
         </div>
       </div>
 
@@ -60,7 +64,7 @@ export default function CalendarPage() {
         <section className="event-list">
           <h3>Coming up</h3>
           {events.map(e => {
-            const daysAway = Math.round((e.date.getTime() - now.getTime()) / 86_400_000);
+            const daysAway = Math.round((e.date.getTime() - today.getTime()) / 86_400_000);
             return (
               <article className="card event-item" key={e.title}>
                 <strong>{e.date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}<small>{e.date.getFullYear()}</small></strong>

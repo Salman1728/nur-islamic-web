@@ -4,7 +4,9 @@ import { BookOpen, CalendarDays, Check, ChevronRight, Compass, GraduationCap, Ha
 import AppShell from '@/components/app-shell';
 import { LiveMark } from '@/components/content-page';
 import { useSettings } from '@/lib/settings';
-import { PRAYERS, formatCountdown, formatTime, prayerState, useNow } from '@/lib/prayer';
+import { PRAYERS, formatCountdown, formatTime, placeHour, prayerState, useNow } from '@/lib/prayer';
+import { hadithOfDay, sunnahUrl } from '@/lib/hadith';
+import { LocationBanner } from '@/components/location-banner';
 import { formatGregorian, formatHijri, upcomingOccasions, HIJRI_MONTHS } from '@/lib/hijri';
 import { dayKey, useStored, type TrackerLog } from '@/lib/store';
 import { LESSONS } from '@/lib/content';
@@ -25,14 +27,16 @@ export default function Dashboard() {
   const [log, setLog] = useStored<TrackerLog>('nur.tracker', {});
   const [done] = useStored<string[]>('nur.lessons', []);
   const state = now ? prayerState(now, settings) : null;
-  const today = now ? log[dayKey(now)] ?? [] : [];
-  const events = now ? upcomingOccasions(now, 3) : [];
+  const day = state?.day ?? null; // calendar day at the chosen place
+  const today = day ? log[dayKey(day)] ?? [] : [];
+  const events = day ? upcomingOccasions(day, 3) : [];
+  const hadith = day ? hadithOfDay(day) : null;
   const nextLesson = LESSONS.find(l => !done.includes(l.slug)) ?? LESSONS[0];
   const pct = Math.round((done.length / LESSONS.length) * 100);
 
   const progress = state && now ? Math.min(100, ((now.getTime() - state.prevTime.getTime()) / (state.next.time.getTime() - state.prevTime.getTime())) * 100) : 0;
-  const toggle = (p: string) => now && setLog(prev => {
-    const k = dayKey(now); const cur = prev[k] ?? [];
+  const toggle = (p: string) => day && setLog(prev => {
+    const k = dayKey(day); const cur = prev[k] ?? [];
     return { ...prev, [k]: cur.includes(p) ? cur.filter(x => x !== p) : [...cur, p] };
   });
 
@@ -43,13 +47,14 @@ export default function Dashboard() {
           <div>
             <LiveMark />
             <h1>Assalamu Alaikum{settings.name ? `, ${settings.name}` : ''}</h1>
-            <p>{now ? `${greeting(now.getHours())}. May Allah bless your day and guide your steps.` : 'May Allah bless your day and guide your steps.'}</p>
+            <p>{now ? `${greeting(placeHour(now, settings))}. May Allah bless your day and guide your steps.` : 'May Allah bless your day and guide your steps.'}</p>
           </div>
           <div className="date-card">
-            <b>{now ? formatHijri(now) : ' '}</b>
-            <small>{now ? formatGregorian(now) : ' '}</small>
+            <b>{day ? formatHijri(day) : ' '}</b>
+            <small>{day ? formatGregorian(day) : ' '}</small>
           </div>
         </div>
+        <LocationBanner />
 
         <div className="dashboard-grid">
           <div className="main-column">
@@ -57,7 +62,7 @@ export default function Dashboard() {
               <article className="next-prayer">
                 <small>Next prayer</small>
                 <h2>{state?.next.name ?? '—'}</h2>
-                <strong>{state ? formatTime(state.next.time, settings.hour24) : '--:--'}</strong>
+                <strong>{state ? formatTime(state.next.time, settings) : '--:--'}</strong>
                 <p>{state && now ? `in ${formatCountdown(state.next.time.getTime() - now.getTime())}` : ' '}</p>
                 <div className="time-progress" role="progressbar" aria-valuenow={Math.round(progress)} aria-valuemin={0} aria-valuemax={100} aria-label="Time until next prayer"><i style={{ width: `${progress}%` }} /></div>
                 <Link href="/prayer">All prayer times <ChevronRight size={15} /></Link>
@@ -74,7 +79,7 @@ export default function Dashboard() {
                         ? <button className={`tick ${prayed ? 'on' : ''}`} onClick={() => toggle(p.name)} aria-pressed={prayed} aria-label={`Mark ${p.name} as prayed`}>{prayed && <Check size={12} />}</button>
                         : <span className="tick ghost" />}
                       <span>{p.name}</span>
-                      <b>{formatTime(p.time, settings.hour24)}</b>
+                      <b>{formatTime(p.time, settings)}</b>
                     </div>
                   );
                 })}
@@ -121,6 +126,13 @@ export default function Dashboard() {
           </div>
 
           <aside className="right-column">
+            {hadith && (
+              <article className="card hadith-card">
+                <div className="card-title"><h3>Hadith of the day</h3><Link href="/hadith">More</Link></div>
+                <blockquote>{hadith.text}</blockquote>
+                <p className="hadith-ref">Narrated by {hadith.narrator} · <a href={sunnahUrl(hadith.number)} target="_blank" rel="noreferrer">Sahih al-Bukhari {hadith.number}</a></p>
+              </article>
+            )}
             <article className="card dhikr">
               <h3>Daily dhikr</h3>
               <div className="arabic small" lang="ar" dir="rtl">سُبْحَانَ اللَّهِ وَبِحَمْدِهِ</div>

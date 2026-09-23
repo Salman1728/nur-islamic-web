@@ -1,6 +1,6 @@
 'use client';
 import { useState } from 'react';
-import { useSettings } from './settings';
+import { browserTz, useSettings } from './settings';
 
 /** Browser geolocation → settings. Coordinates stay in this browser. */
 export function useLocate() {
@@ -14,7 +14,8 @@ export function useLocate() {
     navigator.geolocation.getCurrentPosition(
       pos => {
         const lat = +pos.coords.latitude.toFixed(4), lng = +pos.coords.longitude.toFixed(4);
-        update({ lat, lng, place: `My location (${lat.toFixed(2)}, ${lng.toFixed(2)})` });
+        // The device is where the person is, so its time zone is the place's time zone.
+        update({ lat, lng, tz: browserTz(), place: `My location (${lat.toFixed(2)}, ${lng.toFixed(2)})` });
         setBusy(false);
       },
       err => {

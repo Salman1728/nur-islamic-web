@@ -1,11 +1,12 @@
 'use client';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { BookOpen, BookText, CalendarDays, CheckCircle2, Compass, GraduationCap, HandHeart, Home, MapPin, Menu, MoonStar, Search, Settings, Sparkles, X } from 'lucide-react';
+import { BookOpen, BookText, CalendarDays, CheckCircle2, Compass, GraduationCap, HandHeart, Home, MapPin, Menu, MoonStar, Quote, Search, Settings, Sparkles, X } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useSettings } from '@/lib/settings';
 import { formatCountdown, formatTime, prayerState, useNow } from '@/lib/prayer';
 import { DUAS, LESSONS, TERMS } from '@/lib/content';
+import { HADITHS } from '@/lib/hadith';
 
 export const NAV = [
   [Home, 'Dashboard', '/dashboard'],
@@ -14,6 +15,7 @@ export const NAV = [
   [Sparkles, 'Learn Islam', '/learn'],
   [GraduationCap, 'Learn Salah', '/learn-salah'],
   [HandHeart, 'Duas & Adhkar', '/duas'],
+  [Quote, 'Hadith', '/hadith'],
   [Compass, 'Qibla Finder', '/qibla'],
   [CalendarDays, 'Islamic Calendar', '/calendar'],
   [CheckCircle2, 'Prayer Tracker', '/tracker'],
@@ -27,6 +29,7 @@ const INDEX: Hit[] = [
   ...NAV.map(([, label, href]) => ({ label, hint: 'Page', href })),
   ...LESSONS.map(l => ({ label: l.title, hint: 'Lesson', href: `/learn/${l.slug}` })),
   ...DUAS.map(d => ({ label: `Dua: ${d.title}`, hint: 'Dua', href: `/duas#${d.id}` })),
+  ...HADITHS.map(h => ({ label: `Hadith: ${h.text.slice(0, 60)}…`, hint: h.theme, href: `/hadith#bukhari-${h.number}` })),
   ...TERMS.map(([t]) => ({ label: t, hint: 'Glossary', href: `/terms?q=${encodeURIComponent(t)}` })),
 ];
 
@@ -104,7 +107,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
         <Link href="/prayer" className="side-next" onClick={() => setOpen(false)}>
           <small>Next prayer</small>
           <strong>{state ? state.next.name : '—'}</strong>
-          <span>{state && now ? `${formatTime(state.next.time, settings.hour24)} · in ${formatCountdown(state.next.time.getTime() - now.getTime())}` : ' '}</span>
+          <span>{state && now ? `${formatTime(state.next.time, settings)} · in ${formatCountdown(state.next.time.getTime() - now.getTime())}` : ' '}</span>
         </Link>
       </aside>
       {open && <button className="mobile-overlay" aria-label="Close menu" onClick={() => setOpen(false)} />}
