@@ -1,19 +1,32 @@
 // Qur'an text comes from api.alquran.cloud (Tanzil Uthmani text, Saheeh International translation).
-// Nothing here is typed by hand. Responses are cached indefinitely — the text does not change.
+// Nothing here is typed by hand. What the build prerenders is read from quran-snapshot.json
+// (made by scripts/fetch-quran.mjs) so builds never hit the API's rate limit; any other surah
+// is fetched on first request and cached indefinitely — the text does not change.
+import snapshot from '@/data/quran-snapshot.json';
+
 const API = 'https://api.alquran.cloud/v1';
 
 export type SurahMeta = { number: number; name: string; englishName: string; englishNameTranslation: string; numberOfAyahs: number; revelationType: string };
 export type Ayah = { n: number; global: number; ar: string; en: string; tr: string };
+type Edition = SurahMeta & { ayahs: { number: number; numberInSurah: number; text: string }[] };
+
+/** Surahs in the snapshot — these are the ones prerendered at build time. */
+export const PRERENDERED = Object.keys(snapshot.surahs).map(Number);
 
 async function get<T>(path: string): Promise<T> {
-  const res = await fetch(`${API}${path}`, { next: { revalidate: false } });
-  if (!res.ok) throw new Error(`Qur'an API ${res.status} for ${path}`);
-  const json = await res.json();
-  if (json.code !== 200) throw new Error(`Qur'an API error for ${path}`);
-  return json.data as T;
+  for (let attempt = 1; ; attempt++) {
+    const res = await fetch(`${API}${path}`, { next: { revalidate: false } });
+    if (res.ok) {
+      const json = await res.json();
+      if (json.code === 200) return json.data as T;
+    }
+    // 429 = rate limited: back off briefly and retry a couple of times.
+    if (res.status !== 429 || attempt === 3) throw new Error(`Qur'an API ${res.status} for ${path}`);
+    await new Promise(r => setTimeout(r, 1000 * attempt));
+  }
 }
 
-export const getSurahList = () => get<SurahMeta[]>('/surah');
+export const getSurahList = async () => snapshot.list as SurahMeta[];
 
 const BISMILLAH = 'بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ'.normalize('NFC');
 
@@ -28,8 +41,8 @@ function stripBasmala(text: string) {
 }
 
 export async function getSurah(n: number) {
-  type Edition = SurahMeta & { ayahs: { number: number; numberInSurah: number; text: string }[] };
-  const [ar, en, tr] = await get<Edition[]>(`/surah/${n}/editions/quran-uthmani,en.sahih,en.transliteration`);
+  const cached = (snapshot.surahs as Record<string, Edition[]>)[String(n)];
+  const [ar, en, tr] = cached ?? await get<Edition[]>(`/surah/${n}/editions/quran-uthmani,en.sahih,en.transliteration`);
   const ayahs: Ayah[] = ar.ayahs.map((a, i) => {
     let text = a.text.replace(/^\uFEFF/, '');
     // The Uthmani edition prefixes the basmala to verse 1 of every surah except Al-Fatihah (where it IS verse 1)

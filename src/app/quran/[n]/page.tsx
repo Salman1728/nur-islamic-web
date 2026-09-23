@@ -2,12 +2,12 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import AppShell from '@/components/app-shell';
-import { BEGINNER_SURAHS } from '@/lib/content';
-import { getSurah, surahAudio } from '@/lib/quran';
+import { PRERENDERED, getSurah, surahAudio } from '@/lib/quran';
 import Reader from './reader';
 
 export function generateStaticParams() {
-  return [...BEGINNER_SURAHS, 94].map(n => ({ n: String(n) }));
+  // Only snapshotted surahs are prerendered, so the build never calls the Qur'an API.
+  return PRERENDERED.map(n => ({ n: String(n) }));
 }
 
 function parse(n: string) {
