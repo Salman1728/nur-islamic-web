@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { BookOpen, Check, HandHeart, MoonStar, Sparkles } from 'lucide-react';
+import { PrayerMark } from '@/components/prayer-mark';
 
 const features = [
   { icon: MoonStar, title: 'Prayer times', text: 'Accurate daily prayer times with a clear next-prayer countdown.' },
@@ -15,24 +16,6 @@ const prayerTimes = [
   { name: 'Maghrib', time: '6:42 PM' },
   { name: 'Isha', time: '8:05 PM' },
 ];
-
-/** Sun-position marker: an arc of the day with a dot where the sun sits at this prayer. */
-function PrayerMark({ t, label, moon = false, light = false }: { t: number; label: string; moon?: boolean; light?: boolean }) {
-  const x = 60 - 52 * Math.cos(Math.PI * t);
-  const y = 42 - 34 * Math.sin(Math.PI * t);
-  return (
-    <div className={`prayer-mark${light ? ' light' : ''}`}>
-      <svg viewBox="0 0 120 48" aria-hidden="true">
-        <line className="horizon" x1="0" y1="42" x2="120" y2="42" />
-        <path className="arc" d="M 8 42 A 52 34 0 0 1 112 42" fill="none" />
-        {moon
-          ? <text className="moon" x={x} y={y + 4} textAnchor="middle">☾</text>
-          : <circle className="sun" cx={x} cy={y} r="4.5" />}
-      </svg>
-      <span>{label}</span>
-    </div>
-  );
-}
 
 function Skyline() {
   return (
@@ -113,7 +96,7 @@ export default function LandingPage() {
           <PrayerMark t={0.72} label="Asr — time to grow" />
           <h2>Your first steps, made clear.</h2>
           <p>Move through short lessons covering Shahadah, Wudu, Salah, the Five Pillars and everyday Islamic manners.</p>
-          <Link href="/dashboard" className="primary-button">Open learning journey</Link>
+          <Link href="/learn" className="primary-button">Open learning journey</Link>
         </div>
         <div className="journey-card">
           <div className="progress-head"><strong>My Learning Journey</strong><span>35%</span></div>
@@ -132,7 +115,7 @@ export default function LandingPage() {
         <p className="arabic-verse" lang="ar" dir="rtl">اللَّهُ نُورُ السَّمَاوَاتِ وَالْأَرْضِ</p>
         <p className="verse-en">“Allah is the Light of the heavens and the earth.”</p>
         <span className="verse-ref">Surah An-Nur · 24:35</span>
-        <Link href="/dashboard" className="ghost-button">Read with translation &amp; audio</Link>
+        <Link href="/quran" className="ghost-button">Read with translation &amp; audio</Link>
       </section>
 
       {/* ——— Isha: rest, the day is complete ——— */}

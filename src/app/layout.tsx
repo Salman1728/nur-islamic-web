@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Marcellus, Mulish, Amiri } from 'next/font/google';
 import './globals.css';
+import './app.css';
 
 const marcellus = Marcellus({ weight: '400', subsets: ['latin'], variable: '--font-display' });
 const mulish = Mulish({ subsets: ['latin'], variable: '--font-body' });

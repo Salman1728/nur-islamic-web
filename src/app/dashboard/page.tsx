@@ -1,40 +1,151 @@
+'use client';
 import Link from 'next/link';
-import { Bell, BookOpen, CalendarDays, CheckCircle2, ChevronRight, Compass, GraduationCap, HandHeart, Home, Menu, MoonStar, Search, Settings, Sparkles } from 'lucide-react';
+import { BookOpen, CalendarDays, Check, ChevronRight, Compass, GraduationCap, HandHeart } from 'lucide-react';
+import AppShell from '@/components/app-shell';
+import { LiveMark } from '@/components/content-page';
+import { useSettings } from '@/lib/settings';
+import { PRAYERS, formatCountdown, formatTime, prayerState, useNow } from '@/lib/prayer';
+import { formatGregorian, formatHijri, upcomingOccasions, HIJRI_MONTHS } from '@/lib/hijri';
+import { dayKey, useStored, type TrackerLog } from '@/lib/store';
+import { LESSONS } from '@/lib/content';
 
-const prayers = [['Fajr','5:06 AM'],['Sunrise','6:28 AM'],['Dhuhr','12:20 PM'],['Asr','3:47 PM'],['Maghrib','6:42 PM'],['Isha','8:03 PM']];
-const quick = [[GraduationCap,'Learn Salah','Step-by-step prayer guide'],[BookOpen,'Read Qur’an','Read, listen and reflect'],[Compass,'Qibla Finder','Find direction to the Kaaba'],[HandHeart,'Daily Duas','Essential duas for your day'],[CalendarDays,'Islamic Calendar','Important Islamic dates']];
+const quick = [
+  [GraduationCap, 'Learn Salah', 'Step-by-step prayer guide', '/learn-salah'],
+  [BookOpen, 'Read Qur’an', 'Read, listen and reflect', '/quran'],
+  [Compass, 'Qibla Finder', 'Face the Kaaba', '/qibla'],
+  [HandHeart, 'Daily Duas', 'Duas for every moment', '/duas'],
+  [CalendarDays, 'Islamic Calendar', 'Hijri dates & occasions', '/calendar'],
+] as const;
 
-export default function Dashboard(){
- return <main className="app-shell">
-   <aside className="sidebar">
-    <Link href="/" className="side-brand"><span className="brand-mark light"><MoonStar/></span><span><strong>Nur</strong><small>Your Islamic Companion</small></span></Link>
-    <nav>{[[Home,'Dashboard',true],[MoonStar,'Prayer Times'],[BookOpen,'Qur’an'],[Sparkles,'Learn Islam'],[GraduationCap,'Learn Salah'],[HandHeart,'Duas & Adhkar'],[Compass,'Qibla Finder'],[CalendarDays,'Islamic Calendar'],[CheckCircle2,'Prayer Tracker'],[Settings,'Settings']].map(([Icon,label,active]:any)=><a key={label} className={active?'active':''}><Icon size={18}/>{label}</a>)}</nav>
-    <div className="side-support"><MoonStar size={18}/><strong>Keep the light on</strong><small>Support our mission</small><button>Donate</button></div>
-   </aside>
-   <section className="workspace">
-    <header className="topbar"><button className="mobile-menu"><Menu/></button><div className="searchbox"><Search size={18}/><span>Search anything...</span></div><div className="top-meta"><span>📍 Nairobi, Kenya</span><Bell size={19}/><span className="avatar">S</span><b>Salman</b></div></header>
-    <div className="dashboard-content">
-      <div className="welcome-row"><div><h1>Assalamu Alaikum, Salman 🌿</h1><p>May Allah bless your day and guide your steps.</p></div><div className="date-card"><b>25 Muharram 1448 AH</b><small>Saturday, 11 July 2026</small></div></div>
-      <div className="dashboard-grid">
-       <div className="main-column">
-        <div className="top-cards">
-          <article className="next-prayer"><small>NEXT PRAYER</small><h2>Asr</h2><strong>3:47 <span>PM</span></strong><p>1h 24m remaining</p><div className="time-progress"><i/></div><button>View All Prayer Times</button></article>
-          <article className="prayer-list card"><h3>Today’s Prayer Times</h3>{prayers.map(([n,t])=><div key={n} className={n==='Asr'?'current':''}><span>{n}</span><b>{t}</b></div>)}<small>Calculation: Muslim World League</small></article>
-          <article className="verse-card card"><h3>Daily Qur’an Verse</h3><div className="arabic">إِنَّ مَعَ الْعُسْرِ يُسْرًا</div><p>“Indeed, with hardship comes ease.”</p><small>Surah Ash-Sharh (94:6)</small><button><BookOpen size={16}/> Read in Qur’an</button></article>
+const greeting = (h: number) => (h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening');
+
+export default function Dashboard() {
+  const { settings } = useSettings();
+  const now = useNow(1000);
+  const [log, setLog] = useStored<TrackerLog>('nur.tracker', {});
+  const [done] = useStored<string[]>('nur.lessons', []);
+  const state = now ? prayerState(now, settings) : null;
+  const today = now ? log[dayKey(now)] ?? [] : [];
+  const events = now ? upcomingOccasions(now, 3) : [];
+  const nextLesson = LESSONS.find(l => !done.includes(l.slug)) ?? LESSONS[0];
+  const pct = Math.round((done.length / LESSONS.length) * 100);
+
+  const progress = state && now ? Math.min(100, ((now.getTime() - state.prevTime.getTime()) / (state.next.time.getTime() - state.prevTime.getTime())) * 100) : 0;
+  const toggle = (p: string) => now && setLog(prev => {
+    const k = dayKey(now); const cur = prev[k] ?? [];
+    return { ...prev, [k]: cur.includes(p) ? cur.filter(x => x !== p) : [...cur, p] };
+  });
+
+  return (
+    <AppShell>
+      <main className="dashboard-content">
+        <div className="welcome-row">
+          <div>
+            <LiveMark />
+            <h1>Assalamu Alaikum{settings.name ? `, ${settings.name}` : ''}</h1>
+            <p>{now ? `${greeting(now.getHours())}. May Allah bless your day and guide your steps.` : 'May Allah bless your day and guide your steps.'}</p>
+          </div>
+          <div className="date-card">
+            <b>{now ? formatHijri(now) : ' '}</b>
+            <small>{now ? formatGregorian(now) : ' '}</small>
+          </div>
         </div>
-        <div className="quick-grid">{quick.map(([Icon,title,desc]:any)=><article key={title} className="quick-card"><span><Icon/></span><h4>{title}</h4><p>{desc}</p><ChevronRight size={17}/></article>)}</div>
-        <div className="lower-grid">
-          <article className="card lesson-card"><div className="card-title"><h3>Today’s Lesson</h3><small>5 min read</small></div><div><h4>The Five Pillars of Islam</h4><p>Learn how these five acts shape a Muslim’s life.</p><button>Continue <ChevronRight size={15}/></button></div></article>
-          <article className="card progress-card"><div className="card-title"><h3>My Learning Journey</h3><span>35%</span></div><div className="progress-bar"><i/></div>{['What is Islam?','Shahadah','Five Pillars','How to Make Wudu','How to Pray'].map((x,i)=><p key={x} className={i<3?'done':''}><span>{i<3?'✓':i+1}</span>{x}</p>)}</article>
+
+        <div className="dashboard-grid">
+          <div className="main-column">
+            <div className="top-cards">
+              <article className="next-prayer">
+                <small>Next prayer</small>
+                <h2>{state?.next.name ?? '—'}</h2>
+                <strong>{state ? formatTime(state.next.time, settings.hour24) : '--:--'}</strong>
+                <p>{state && now ? `in ${formatCountdown(state.next.time.getTime() - now.getTime())}` : ' '}</p>
+                <div className="time-progress" role="progressbar" aria-valuenow={Math.round(progress)} aria-valuemin={0} aria-valuemax={100} aria-label="Time until next prayer"><i style={{ width: `${progress}%` }} /></div>
+                <Link href="/prayer">All prayer times <ChevronRight size={15} /></Link>
+              </article>
+
+              <article className="card prayer-list">
+                <h3>Today’s prayers</h3>
+                {(state?.today ?? []).map(p => {
+                  const isPrayer = p.name !== 'Sunrise';
+                  const prayed = today.includes(p.name);
+                  return (
+                    <div key={p.name} className={`${p.name === state?.current ? 'current' : ''} ${!isPrayer ? 'muted' : ''}`}>
+                      {isPrayer
+                        ? <button className={`tick ${prayed ? 'on' : ''}`} onClick={() => toggle(p.name)} aria-pressed={prayed} aria-label={`Mark ${p.name} as prayed`}>{prayed && <Check size={12} />}</button>
+                        : <span className="tick ghost" />}
+                      <span>{p.name}</span>
+                      <b>{formatTime(p.time, settings.hour24)}</b>
+                    </div>
+                  );
+                })}
+                <small>{PRAYERS.filter(p => today.includes(p)).length} of 5 marked · <Link href="/tracker">tracker</Link></small>
+              </article>
+
+              <article className="card verse-card">
+                <h3>A verse to carry</h3>
+                <div className="arabic" lang="ar" dir="rtl">إِنَّ مَعَ الْعُسْرِ يُسْرًا</div>
+                <p>“Indeed, with hardship comes ease.”</p>
+                <small>Surah Ash-Sharh · 94:6</small>
+                <Link href="/quran/94" className="text-link"><BookOpen size={15} /> Read the surah</Link>
+              </article>
+            </div>
+
+            <div className="quick-grid">
+              {quick.map(([Icon, title, desc, href]) => (
+                <Link href={href} key={title} className="quick-card">
+                  <span className="arch-icon"><Icon size={20} /></span>
+                  <h4>{title}</h4>
+                  <p>{desc}</p>
+                </Link>
+              ))}
+            </div>
+
+            <div className="lower-grid">
+              <article className="card lesson-card">
+                <div className="card-title"><h3>{done.length === LESSONS.length ? 'Review a lesson' : 'Up next'}</h3><small>{nextLesson.minutes} min read</small></div>
+                <div className="lesson-inner">
+                  <h4>{nextLesson.title}</h4>
+                  <p>{nextLesson.summary}</p>
+                  <Link href={`/learn/${nextLesson.slug}`} className="primary-button small">Continue <ChevronRight size={15} /></Link>
+                </div>
+              </article>
+              <article className="card progress-card">
+                <div className="card-title"><h3>My learning journey</h3><span>{pct}%</span></div>
+                <div className="progress-bar"><i style={{ width: `${pct}%` }} /></div>
+                {LESSONS.slice(0, 5).map((l, i) => {
+                  const d = done.includes(l.slug);
+                  return <Link href={`/learn/${l.slug}`} key={l.slug} className={d ? 'done' : ''}><span>{d ? '✓' : i + 1}</span>{l.title}</Link>;
+                })}
+              </article>
+            </div>
+          </div>
+
+          <aside className="right-column">
+            <article className="card dhikr">
+              <h3>Daily dhikr</h3>
+              <div className="arabic small" lang="ar" dir="rtl">سُبْحَانَ اللَّهِ وَبِحَمْدِهِ</div>
+              <b>Subḥāna-Llāhi wa bi-ḥamdih</b>
+              <p>Glory be to Allah and praise be to Him.</p>
+              <span className="chip">100 times · Bukhari 6405</span>
+            </article>
+            <article className="card events">
+              <div className="card-title"><h3>Coming up</h3><Link href="/calendar">Calendar</Link></div>
+              {events.map(e => (
+                <div key={e.title}>
+                  <b>{e.date.toLocaleDateString('en-GB', { day: '2-digit' })}<small>{e.date.toLocaleDateString('en-GB', { month: 'short' }).toUpperCase()}</small></b>
+                  <span><strong>{e.title}</strong><small>{e.hijri.day} {HIJRI_MONTHS[e.hijri.month - 1]} {e.hijri.year} · expected</small></span>
+                </div>
+              ))}
+            </article>
+            <article className="card beginner">
+              <span className="page-eyebrow">New to Islam?</span>
+              <h3>Start your journey here.</h3>
+              <p>Short, gentle lessons written for reverts and new learners.</p>
+              <Link href="/learn" className="primary-button small">Start learning <ChevronRight size={15} /></Link>
+            </article>
+          </aside>
         </div>
-       </div>
-       <aside className="right-column">
-        <article className="card dhikr"><h3>Daily Dhikr</h3><div className="arabic small">سُبْحَانَ اللَّهِ وَبِحَمْدِهِ</div><b>SubhanAllahi wa bihamdihi</b><p>Glory be to Allah and praise be to Him.</p><span>100 times</span></article>
-        <article className="card events"><div className="card-title"><h3>Upcoming Events</h3><small>View all</small></div><div><b>28 JUL</b><span><strong>First Day of Muharram</strong><small>1 Muharram 1448 AH</small></span></div><div><b>05 SEP</b><span><strong>Eid al-Fitr (Tentative)</strong><small>1 Shawwal 1448 AH</small></span></div></article>
-        <article className="card beginner"><span className="eyebrow">New to Islam?</span><h3>Start your journey here.</h3><p>Short, gentle lessons created for reverts and new learners.</p><button>Start Learning <ChevronRight size={15}/></button></article>
-       </aside>
-      </div>
-    </div>
-   </section>
- </main>
+      </main>
+    </AppShell>
+  );
 }
