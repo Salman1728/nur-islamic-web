@@ -1,12 +1,13 @@
 'use client';
 import { useState } from 'react';
-import { Clock, LocateFixed, MapPin, Moon, Trash2, User } from 'lucide-react';
+import Link from 'next/link';
+import { Bell, Clock, LocateFixed, MapPin, Moon, Trash2, User } from 'lucide-react';
 import { ContentPage } from '@/components/content-page';
 import { CITIES, METHODS, useSettings, type Method } from '@/lib/settings';
 import { useLocate } from '@/lib/locate';
 import { tzLabel } from '@/lib/prayer';
 
-const STORED_KEYS = ['nur.settings', 'nur.tracker', 'nur.lessons', 'nur.duas.saved', 'nur.quran.bookmark', 'nur.quran.translit', 'nur.quran.english', 'nur.world', 'nur.visited', 'nur.practice', 'nur.journey.manual', 'nur.quran.last', 'nur.quran.mode', 'nur.quran.size', 'nur.quran.tab'];
+const STORED_KEYS = ['nur.settings', 'nur.tracker', 'nur.lessons', 'nur.duas.saved', 'nur.quran.bookmark', 'nur.quran.translit', 'nur.quran.english', 'nur.world', 'nur.visited', 'nur.practice', 'nur.journey.manual', 'nur.quran.last', 'nur.quran.mode', 'nur.quran.size', 'nur.quran.tab', 'nur.reminders', 'nur.notified'];
 const REGIONS = [...new Set(CITIES.map(c => c.region))];
 
 export default function SettingsPage() {
@@ -21,7 +22,7 @@ export default function SettingsPage() {
   };
 
   return (
-    <ContentPage eyebrow="Your preferences" title="Settings" description="Everything here is saved in this browser only. Nothing is sent to a server.">
+    <ContentPage eyebrow="Your preferences" title="Settings" description="Everything here is saved in this browser only. The one exception is the optional calendar feed, whose link carries your location so Nur can calculate the times — nothing is stored.">
       <div className="settings-list">
         <label className="card setting-row">
           <User />
@@ -67,6 +68,12 @@ export default function SettingsPage() {
           <div><b>24-hour clock</b><small>Show 17:45 instead of 5:45 PM.</small></div>
           <input type="checkbox" className="switch" checked={settings.hour24} onChange={e => update({ hour24: e.target.checked })} />
         </label>
+
+        <Link href="/prayer#reminders" className="card setting-row">
+          <Bell />
+          <div><b>Prayer reminders</b><small>Calendar alerts that work even when Nur is closed, plus notifications while it’s open.</small></div>
+          <strong className="setting-link">Set up →</strong>
+        </Link>
 
         <div className="card setting-row danger">
           <Trash2 />

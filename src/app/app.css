@@ -636,3 +636,23 @@
   .size-controls .muted-text { display: none; }
   .verse-sheet { bottom: 10px; }
 }
+
+/* ——— Reminders ——— */
+.reminder-card { margin-top: 18px; scroll-margin-top: 90px; }
+.reminder-card h3, .reminder-block h4 { display: inline-flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.reminder-field { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 6px; }
+.reminder-field label { font-weight: 700; font-size: 14px; }
+.reminder-field .field { max-width: 100%; }
+.reminder-block { padding-top: 16px; margin-top: 16px; border-top: 1px solid var(--line); }
+.reminder-block h4 { margin: 0 0 6px; font-size: 15px; }
+.reminder-block .chip { margin-left: 0; background: #e5f1ea; color: var(--leaf); }
+.reminder-block .chip.muted { background: #f1ebdc; color: #6b5b38; }
+.reminder-block > .muted-text { margin: 0 0 12px; line-height: 1.6; }
+.reminder-block .inline-actions a[aria-disabled="true"] { pointer-events: none; opacity: .5; }
+.fine-print.tight { margin-top: 10px; }
+.toggle-row { display: flex; align-items: center; gap: 12px; font-size: 14px; cursor: pointer; margin-bottom: 12px; }
+.chip-toggles { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+.chip-toggles button { padding: 7px 14px; border-radius: 999px; border: 1px solid var(--line); background: var(--card); color: var(--muted); font-size: 13px; font-weight: 700; }
+.chip-toggles button.on { background: var(--leaf); border-color: var(--leaf); color: #fff; }
+.setting-link { font-size: 13px; color: var(--leaf); white-space: nowrap; }
+a.setting-row:hover { border-color: var(--gold); }

@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { Globe2, LocateFixed, MapPin, Settings2, X } from 'lucide-react';
 import { ContentPage } from '@/components/content-page';
 import { LocationBanner } from '@/components/location-banner';
+import { ReminderPanel } from '@/components/reminder-panel';
 import { CITIES, METHODS, useSettings, type Settings } from '@/lib/settings';
 import { addDays, dayTimes, formatCountdown, formatTime, prayerState, tzLabel, useNow } from '@/lib/prayer';
 import { formatHijri } from '@/lib/hijri';
@@ -90,6 +91,8 @@ export default function PrayerPage() {
           <Link href="/settings" className="method"><Settings2 size={14} /> {methodName} · Asr: {settings.madhab === 'hanafi' ? 'Hanafi' : 'Standard'} · change</Link>
         </section>
       </div>
+
+      <ReminderPanel />
 
       <WorldClock now={now} base={settings} />
 

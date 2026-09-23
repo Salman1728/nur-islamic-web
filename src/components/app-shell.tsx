@@ -8,6 +8,7 @@ import { formatCountdown, formatTime, prayerState, useNow } from '@/lib/prayer';
 import { DUAS, LESSONS, TERMS } from '@/lib/content';
 import { HADITHS } from '@/lib/hadith';
 import { useStored } from '@/lib/store';
+import { registerServiceWorker, useReminderEngine } from '@/lib/reminders';
 
 export const NAV = [
   [Home, 'Dashboard', '/dashboard'],
@@ -89,6 +90,8 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   const { settings } = useSettings();
   const now = useNow(1000);
   const state = now ? prayerState(now, settings) : null;
+  useReminderEngine(now, state, settings);
+  useEffect(() => { void registerServiceWorker(); }, []);
   const initial = settings.name.trim().charAt(0).toUpperCase();
 
   useEffect(() => { document.body.style.overflow = open ? 'hidden' : ''; }, [open]);
