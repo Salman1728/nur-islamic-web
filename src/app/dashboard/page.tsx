@@ -8,6 +8,7 @@ import { PRAYERS, formatCountdown, formatTime, placeHour, prayerState, useNow } 
 import { hadithOfDay, sunnahUrl } from '@/lib/hadith';
 import { LocationBanner } from '@/components/location-banner';
 import { useJourney } from '@/lib/use-journey';
+import type { LastRead } from '../quran/[n]/reader';
 import { formatGregorian, formatHijri, upcomingOccasions, HIJRI_MONTHS } from '@/lib/hijri';
 import { dayKey, useStored, type TrackerLog } from '@/lib/store';
 import { LESSONS } from '@/lib/content';
@@ -28,6 +29,7 @@ export default function Dashboard() {
   const [log, setLog] = useStored<TrackerLog>('nur.tracker', {});
   const [done] = useStored<string[]>('nur.lessons', []);
   const journey = useJourney();
+  const [lastRead] = useStored<LastRead>('nur.quran.last', null);
   const state = now ? prayerState(now, settings) : null;
   const day = state?.day ?? null; // calendar day at the chosen place
   const today = day ? log[dayKey(day)] ?? [] : [];
@@ -93,7 +95,9 @@ export default function Dashboard() {
                 <div className="arabic" lang="ar" dir="rtl">إِنَّ مَعَ الْعُسْرِ يُسْرًا</div>
                 <p>“Indeed, with hardship comes ease.”</p>
                 <small>Surah Ash-Sharh · 94:6</small>
-                <Link href="/quran/94" className="text-link"><BookOpen size={15} /> Read the surah</Link>
+                {lastRead
+                  ? <Link href={`/quran/${lastRead.surah}#ayah-${lastRead.ayah}`} className="text-link"><BookOpen size={15} /> Continue: {lastRead.name} · {lastRead.ayah}</Link>
+                  : <Link href="/quran/94" className="text-link"><BookOpen size={15} /> Read the surah</Link>}
               </article>
             </div>
 

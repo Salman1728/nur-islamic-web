@@ -1,5 +1,5 @@
 import AppShell from '@/components/app-shell';
-import { getSurah } from '@/lib/quran';
+import { getSurah } from '@/lib/quran-data';
 import PrayAlong from './pray-along';
 
 export const metadata = { title: 'Pray-along practice — Nur' };
