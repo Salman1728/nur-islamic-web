@@ -183,6 +183,8 @@ h1, h2 { font-family: var(--font-display), Georgia, serif; font-weight: 400; }
   display: flex; justify-content: space-between; align-items: center; gap: 20px;
 }
 .footer-base p { font-size: 14px; color: #93a49a; margin: 0; }
+.footer-links { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px 24px; font-size: 14px; color: #c3cfc6; }
+.footer-links a:hover { color: var(--dawn-bright); }
 
 /* ————— Landing responsive ————— */
 @media (max-width: 1100px) {

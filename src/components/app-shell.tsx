@@ -94,7 +94,13 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   useEffect(() => { void registerServiceWorker(); }, []);
   const initial = settings.name.trim().charAt(0).toUpperCase();
 
-  useEffect(() => { document.body.style.overflow = open ? 'hidden' : ''; }, [open]);
+  // Lock page scroll behind the open menu. The cleanup also runs on unmount, so leaving the app
+  // (e.g. the logo back to the landing page) can never strand the lock on the next page.
+  useEffect(() => {
+    if (!open) return;
+    document.body.style.overflow = 'hidden';
+    return () => { document.body.style.overflow = ''; };
+  }, [open]);
 
   // Pages seen, kept in this browser only — lets "My first 30 days" tick steps off by itself.
   const [, setVisited] = useStored<string[]>('nur.visited', []);
@@ -104,7 +110,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
     <div className="app-shell" data-phase={state?.phase ?? 'dhuhr'}>
       <aside className={`sidebar ${open ? 'open' : ''}`} aria-label="Main navigation">
         <div className="side-head">
-          <Link href="/" className="side-brand"><span className="brand-mark"><MoonStar size={20} /></span><span><strong>Nur</strong><small>Your Islamic Companion</small></span></Link>
+          <Link href="/" className="side-brand" onClick={() => setOpen(false)}><span className="brand-mark"><MoonStar size={20} /></span><span><strong>Nur</strong><small>Your Islamic Companion</small></span></Link>
           <button className="side-close" aria-label="Close menu" onClick={() => setOpen(false)}><X /></button>
         </div>
         <nav>
